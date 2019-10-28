@@ -1,4 +1,5 @@
 var mysql = require("mysql");
+var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -31,5 +32,51 @@ function queryAllProducts() {
         }
         console.log("-----------------------------------------");
         connection.end();
+        start();
     });
+}
+
+let itemID = null;
+let itemAmt = null;
+
+function start(){
+    inquirer
+        .prompt({
+            name: "id_num",
+            type: "number",
+            message: "Enter the Item ID number for the item you'd like to purchase."
+        })
+        .then(function(answer) {
+            if (answer.id_num < 1 || answer.id_num > 10){
+                console.log("Please enter correct an ID number between 1 and 10");
+                start();
+            } else {
+                console.log("inputed ID number: " + answer.id_num);
+                itemID = answer.id_num;
+                amountRequested();
+            }
+        });
+}
+
+function amountRequested(){
+    inquirer
+        .prompt({
+            name: "amount",
+            type: "number",
+            message: "How many units of the product would you like to buy?"
+        })
+        .then(function(answer) {
+            if(answer.amount < 1){
+                console.log("Please enter a value larger than 0.");
+                amountRequested();
+            } else {
+                console.log("inputed amount: " + answer.amount);
+                itemAmt = answer.amount;
+                receipt(itemID, itemAmt);
+            }
+        });
+}
+
+function receipt(id, amt){
+    console.log("id " + id + " amt: " + amt);
 }
