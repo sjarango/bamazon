@@ -20,3 +20,18 @@ VALUES ("Casio Watch", "watch", 14.95, 30), ("Rolex Watch", "watch", 8550.00, 3)
 ("Samsung Galaxy Note 10", "phone", 945, 400);
 
 SELECT * FROM bamazon.products;
+
+-- To get price of item using its id number
+SELECT price, stock_quantity 
+FROM products 
+WHERE item_id="2";
+
+-- Too update stock quantity of a specific item
+UPDATE products 
+SET stock_quantity = 30
+WHERE item_id = 1;
+
+-- Printing results for that updated item
+SELECT * 
+FROM products
+WHERE item_id = 1;
