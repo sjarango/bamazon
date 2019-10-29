@@ -39,11 +39,10 @@ function queryAllProducts() {
 let inputID = null;
 let inputAmt = null;
 
+let itemPrice = null;
+let itemStock = null;
+
 function start() {
-
-    let itemPrice = null;
-    let itemStock = null;
-
     inquirer
         .prompt({
             name: "id_num",
@@ -66,14 +65,15 @@ function start() {
                         itemStock = parseFloat(res[0].stock_quantity);
                         console.log("price: " + itemPrice);
                         console.log("stock: " + itemStock);
-                        connection.end();
-                        amountRequested(itemStock);
+                        //connection.end();
+                        amountRequested(itemStock, itemPrice);
                     });
             }
         });
 }
 
-function amountRequested(stock) {
+function amountRequested(stock, price) {
+    var diff = null;
     inquirer
         .prompt({
             name: "amount",
@@ -84,17 +84,31 @@ function amountRequested(stock) {
 
             if (answer.amount < 1) {
                 console.log("Please enter a value larger than 0.");
-                amountRequested();
+                amountRequested(itemStock, itemPrice);
             } else if (answer.amount > stock) {
                 console.log("Insufficient Quantity!");
+                amountRequested(itemStock, itemPrice);
             } else {
                 console.log("inputed amount: " + answer.amount);
                 inputAmt = answer.amount;
-                receipt(inputID, inputAmt);
+                diff = stock - inputAmt;
+                updateStock(inputID, diff);
+                receipt(inputAmt, price);
             }
         });
 }
 
-function receipt(id, amt) {
-    console.log("id " + id + " amt: " + amt);
+function updateStock(id, difference) {
+    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
+        [difference, id],
+        function (err, res) {
+            if (err) throw err;
+            console.log(res);
+            connection.end();
+        });
+}
+
+function receipt(amount, price) {
+    var total = price * amount;
+    console.log("Total Price: $" + total);
 }
